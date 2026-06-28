@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,13 +9,21 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <title>ShopSync Streaming</title>
-    
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function () {
+            emailjs.init("DtJGANuQ8pzr96RXW");
+        })();
+    </script>
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <!-- TELA DE LOGIN -->
@@ -22,55 +31,97 @@
         <div class="login-container">
             <div class="login-left">
                 <div class="login-left-content">
-                    <img src="Sem nome (3080 x 1920 px) (2080 x 1920 px).svg" alt="Logo" class="login-logo" style="height: 24rem; width: 24rem; margin: 0 auto 20px auto; display: block;">
+                    <img src="Sem nome (3080 x 1920 px) (2080 x 1920 px).svg" alt="Logo" class="login-logo"
+                        style="height: 24rem; width: 24rem; margin: 0 auto 20px auto; display: block;">
                     <h1>ShopSync Streaming</h1>
-                    <p>O seu painel profissional para gestão de subscrições, clientes e emissão de recibos automáticos.</p>
+                    <p>O seu painel profissional para gestão de subscrições, clientes e emissão de recibos automáticos.
+                    </p>
                 </div>
             </div>
             <div class="login-right">
                 <div class="login-card">
                     <img src="Sem nome (3080 x 1920 px) (2080 x 1920 px).svg" alt="Logo" class="mobile-login-logo">
                     <h2>Bem-vindo de volta</h2>
-                    <p style="text-align: center; color: var(--text-muted); margin-bottom: 32px; font-size: 14px;">Introduza as suas credenciais para entrar na plataforma.</p>
-                    <div class="input-group">
-                        <i data-lucide="mail" class="input-icon" size="18"></i>
-                        <input type="email" id="loginEmail" placeholder="Email">
-                    </div>
-                    <div class="input-group">
-                        <i data-lucide="lock" class="input-icon" size="18"></i>
-                        <input type="password" id="loginSenha" placeholder="Palavra-passe">
-                        <i data-lucide="eye" class="input-icon-right" id="togglePasswordBtn" size="18" style="cursor:pointer;" onclick="togglePasswordVisibility()"></i>
-                    </div>
-                    <button class="btn-primary" id="btnLogin" onclick="fazerLogin()"><i data-lucide="log-in" size="20"></i> Entrar</button>
+                    <p style="text-align: center; color: var(--text-muted); margin-bottom: 32px; font-size: 14px;">
+                        Introduza as suas credenciais para entrar na plataforma.</p>
+                    <form onsubmit="event.preventDefault(); window.fazerLogin();">
+                        <div class="input-group">
+                            <i data-lucide="mail" class="input-icon" size="18"></i>
+                            <input type="email" id="loginEmail" placeholder="Email" autocomplete="username">
+                        </div>
+                        <div class="input-group">
+                            <i data-lucide="lock" class="input-icon" size="18"></i>
+                            <input type="password" id="loginSenha" placeholder="Palavra-passe" autocomplete="current-password">
+                            <i data-lucide="eye" class="input-icon-right" id="togglePasswordBtn" size="18"
+                                style="cursor:pointer;" onclick="window.togglePasswordVisibility()"></i>
+                        </div>
+                        <button type="submit" class="btn-primary" id="btnLogin"><i data-lucide="log-in"
+                                size="20"></i> Entrar</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="window.toggleSidebar()"></div>
     <nav class="sidebar">
         <div class="sidebar-brand">
-            <span style="font-weight: 800; font-size: 24px; color: white;"><img src="Sem nome (3080 x 1920 px) (2080 x 1920 px).svg" alt="" style="height: 28rem; width: 20rem; margin-left: -50px;"></span>
+            <span style="font-weight: 800; font-size: 24px; color: white;"><img
+                    src="Sem nome (3080 x 1920 px) (2080 x 1920 px).svg" alt=""
+                    style="height: 28rem; width: 20rem; margin-left: -50px;"></span>
         </div>
+
+        <div class="sidebar-profile" onclick="window.mostrarPerfilUsuario(); if(window.innerWidth <= 768) window.toggleSidebar();">
+            <div class="profile-icon-sidebar"><i data-lucide="user" size="20"></i></div>
+            <div class="profile-info-sidebar">
+                <span style="font-size: 14px; font-weight: 600; color: var(--text-main);">Meu Perfil</span>
+                <span style="font-size: 11px; color: var(--success);">Conta Ativa</span>
+            </div>
+        </div>
+
         <div class="nav-menu">
-            <button class="nav-link active" data-target="screen-home" onclick="navTo('screen-home')"><i data-lucide="layout-dashboard"></i> Painel</button>
-            <button class="nav-link" data-target="screen-sales" onclick="navTo('screen-sales')"><i data-lucide="plus-circle"></i> Vender</button>
-            <button class="nav-link" data-target="screen-records" onclick="navTo('screen-records')"><i data-lucide="folder-open"></i> Registos</button>
-            <button class="nav-link" data-target="screen-settings" onclick="navTo('screen-settings')"><i data-lucide="settings"></i> Configurações</button>
+            <button class="nav-link active" data-target="screen-home" onclick="window.navTo('screen-home')"><i
+                    data-lucide="layout-dashboard"></i> Painel</button>
+            <button class="nav-link" data-target="screen-sales" onclick="window.prepararNovaVenda()"><i
+                    data-lucide="plus-circle"></i> Vender</button>
+            <button class="nav-link" data-target="screen-records" onclick="window.navTo('screen-records')"><i
+                    data-lucide="folder-open"></i> Registos</button>
+            <button class="nav-link" data-target="screen-settings" onclick="window.navTo('screen-settings')"><i
+                    data-lucide="settings"></i> Configurações</button>
+
+            <button class="nav-link" id="btnToggleTheme" onclick="window.toggleTheme()"><i data-lucide="sun"></i> Modo
+                Claro</button>
+
+            <div style="height: 1px; background: var(--border-color); margin: 8px 0;"></div>
+
+            <button class="nav-link hide-on-desktop"
+                onclick="document.getElementById('modalConfirmacao').style.display='flex'; window.toggleSidebar();"
+                style="color: var(--danger);"><i data-lucide="log-out"></i> Terminar Sessão</button>
         </div>
     </nav>
 
     <main class="main-content">
         <header class="header">
             <div class="header-title">
-                <button class="back-btn" id="btnBack" onclick="goBack()"><i data-lucide="arrow-left" size="20"></i></button>
+                <button class="menu-hamb-btn" id="btnMenu" onclick="window.toggleSidebar()"><i data-lucide="menu"
+                        size="24"></i></button>
+                <button class="back-btn" id="btnBack" onclick="window.goBack()"><i data-lucide="arrow-left"
+                        size="20"></i></button>
                 <span id="appTitle">Painel Geral</span>
                 <div class="mobile-brand">
-                    <span style="font-weight: 800; font-size: 20px; color: white;"><img src="Sem nome (3080 x 1920 px) (2080 x 1920 px).svg" alt="" style="height: 28rem; width: 20rem; margin-left: -60px;"></span>
+                    <span style="font-weight: 800; font-size: 20px; color: white;"><img
+                            src="Sem nome (3080 x 1920 px) (2080 x 1920 px).svg" alt=""
+                            style="height: 28rem; width: 20rem; margin-left: -60px;"></span>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 16px;">
-                <button class="btn-secondary" onclick="document.getElementById('modalConfirmacao').style.display='flex'" style="border-color: var(--danger); color: var(--danger);"><i data-lucide="log-out" size="16"></i> Sair</button>
-                <div style="width: 36px; height: 36px; background: var(--bg-elevated); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor:pointer;" onclick="mostrarPerfilUsuario()"><i data-lucide="user" size="18"></i></div>
+                <button class="btn-secondary hide-on-mobile"
+                    onclick="document.getElementById('modalConfirmacao').style.display='flex'"
+                    style="border-color: var(--danger); color: var(--danger);"><i data-lucide="log-out" size="16"></i>
+                    Sair</button>
+                <div class="hide-on-mobile"
+                    style="width: 36px; height: 36px; background: var(--bg-elevated); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor:pointer;"
+                    onclick="window.mostrarPerfilUsuario()"><i data-lucide="user" size="18"></i></div>
             </div>
         </header>
 
@@ -82,39 +133,55 @@
                         <p class="subtitle" style="margin-bottom:0;">Desempenho Financeiro e Operacional</p>
                     </div>
                     <div style="position: relative; display: inline-flex; align-items: center;">
-                        <i data-lucide="filter" size="16" style="position: absolute; left: 14px; color: var(--text-muted); pointer-events: none; z-index: 2;"></i>
-                        <select id="dashFiltroServico" class="filter-select" style="margin-bottom:0; width: 170px; height: 44px; padding-left: 40px; border-radius: 12px; background: linear-gradient(145deg, #1f222a, #16181d);" onchange="calcularEstatisticas()">
+                        <i data-lucide="filter" size="16"
+                            style="position: absolute; left: 14px; color: var(--text-muted); pointer-events: none; z-index: 2;"></i>
+                        <select id="dashFiltroServico" class="filter-select"
+                            style="margin-bottom:0; width: 170px; height: 44px; padding-left: 40px; border-radius: 12px;"
+                            onchange="window.calcularEstatisticas()">
                             <option value="Todos">Visão Global</option>
                             <option value="Netflix">Netflix</option>
                             <option value="Prime Video">Prime Video</option>
+                            <!-- <option value="Spotify">Spotify</option> -->
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="dashboard-grid">
                     <div class="dash-card">
-                        <div class="dash-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);"><i data-lucide="wallet" size="24"></i></div>
+                        <div class="dash-icon"
+                            style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);">
+                            <i data-lucide="wallet" size="24"></i>
+                        </div>
                         <div class="dash-info">
                             <span class="dash-label">Receita (Mês)</span>
                             <span class="dash-value" id="dashReceita">...</span>
                         </div>
                     </div>
                     <div class="dash-card">
-                        <div class="dash-icon" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);"><i data-lucide="trending-up" size="24"></i></div>
+                        <div class="dash-icon"
+                            style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+                            <i data-lucide="trending-up" size="24"></i>
+                        </div>
                         <div class="dash-info">
                             <span class="dash-label">Lucro Líquido</span>
                             <span class="dash-value" id="dashLucro" style="color:var(--success);">...</span>
                         </div>
                     </div>
                     <div class="dash-card">
-                        <div class="dash-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);"><i data-lucide="users" size="24"></i></div>
+                        <div class="dash-icon"
+                            style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);">
+                            <i data-lucide="users" size="24"></i>
+                        </div>
                         <div class="dash-info">
                             <span class="dash-label">Contas Ativas</span>
                             <span class="dash-value" id="dashAtivos">...</span>
                         </div>
                     </div>
                     <div class="dash-card">
-                        <div class="dash-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);"><i data-lucide="alert-circle" size="24"></i></div>
+                        <div class="dash-icon"
+                            style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
+                            <i data-lucide="alert-circle" size="24"></i>
+                        </div>
                         <div class="dash-info">
                             <span class="dash-label">Expiram em 3 Dias</span>
                             <span class="dash-value" id="dashExpirar">...</span>
@@ -122,36 +189,94 @@
                     </div>
                 </div>
 
-                <div class="chart-container" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-top: 24px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3 style="margin: 0; font-size: 18px; display: flex; align-items: center; gap: 8px;"><i data-lucide="bar-chart-3" size="20" style="color: var(--accent-blue);"></i> Evolução de Receita (Últimos 7 Dias)</h3>
+                <div class="chart-container"
+                    style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-top: 24px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; font-size: 18px; display: flex; align-items: center; gap: 8px;"><i
+                                data-lucide="line-chart" size="20" style="color: var(--accent-blue);"></i> Desempenho (Últimos 7 Dias)</h3>
                     </div>
                     <div style="position: relative; height: 250px; width: 100%;">
-                        <canvas id="graficoVendas"></canvas>
+                        <canvas id="graficoDesempenho7Dias"></canvas>
                     </div>
                 </div>
 
                 <h2 style="margin-top:40px;">Serviços Ativos</h2>
                 <p class="subtitle">Faça a gestão da capacidade das suas plataformas.</p>
                 <div class="grid-brands">
-                    <div class="brand-card netflix" onclick="selecionarServico('Netflix')">
-                        <div class="svg-container"><span style="font-weight:bold; font-size:24px; color:#E50914;"><img src="icons8-netflix.svg" alt=""></span></div>
-                        <div style="display: flex; justify-content: space-between; width: 100%; color: var(--text-muted); font-size: 14px;">
-                            <span>Conta Registada</span><span style="color: var(--text-main); font-weight: 600;">Nova Venda &rarr;</span>
+                    <div class="brand-card netflix" onclick="window.selecionarServico('Netflix')">
+                        <div class="svg-container"><span style="font-weight:bold; font-size:24px; color:#E50914;"><img
+                                    src="icons8-netflix.svg" alt=""></span></div>
+                        <div
+                            style="display: flex; justify-content: space-between; width: 100%; color: var(--text-muted); font-size: 14px;">
+                            <span>Plataforma</span><span style="color: var(--text-main); font-weight: 600;">Vender
+                                &rarr;</span>
                         </div>
                     </div>
-                    <div class="brand-card prime" onclick="selecionarServico('Prime Video')">
-                        <div class="svg-container"><span style="font-weight:bold; font-size:20px; color:#00A8E1;"><img src="icons8-amazon-prime.svg" alt=""></span></div>
-                        <div style="display: flex; justify-content: space-between; width: 100%; color: var(--text-muted); font-size: 14px;">
-                            <span>Conta Registada</span><span style="color: var(--text-main); font-weight: 600;">Nova Venda &rarr;</span>
+                    <div class="brand-card prime" onclick="window.selecionarServico('Prime Video')">
+                        <div class="svg-container"><span style="font-weight:bold; font-size:20px; color:#00A8E1;"><img
+                                    src="icons8-amazon-prime.svg" alt=""></span></div>
+                        <div
+                            style="display: flex; justify-content: space-between; width: 100%; color: var(--text-muted); font-size: 14px;">
+                            <span>Plataforma</span><span style="color: var(--text-main); font-weight: 600;">Vender
+                                &rarr;</span>
                         </div>
                     </div>
+                    <!-- 
+                    <div class="brand-card spotify" onclick="window.selecionarServico('Spotify')"
+                        style="border-left: 4px solid #1DB954;">
+                        <div class="svg-container"><span style="font-weight:bold; font-size:24px; color:#1DB954;"><img
+                                    src="spotify-ar21.svg" alt="Spotify" style="height:24px;"></span></div>
+                        <div
+                            style="display: flex; justify-content: space-between; width: 100%; color: var(--text-muted); font-size: 14px;">
+                            <span>Plataforma</span><span style="color: var(--text-main); font-weight: 600;">Vender
+                                &rarr;</span>
+                        </div>
+                    </div>
+                    -->
                 </div>
             </div>
         </div>
 
         <div id="screen-sales" class="screen">
-            <div class="content-wrapper">
+            <div class="content-wrapper" id="venda-escolha-servico" style="display: none;">
+                <h2>Nova Venda</h2>
+                <p class="subtitle">Selecione a plataforma em que deseja registar uma nova venda.</p>
+                <div class="grid-brands" style="margin-top: 24px;">
+                    <div class="brand-card netflix" onclick="window.selecionarServico('Netflix')">
+                        <div class="svg-container"><span style="font-weight:bold; font-size:24px; color:#E50914;"><img
+                                    src="icons8-netflix.svg" alt=""></span></div>
+                        <div
+                            style="display: flex; justify-content: space-between; width: 100%; color: var(--text-muted); font-size: 14px;">
+                            <span>Plataforma</span><span style="color: var(--text-main); font-weight: 600;">Vender
+                                &rarr;</span>
+                        </div>
+                    </div>
+                    <div class="brand-card prime" onclick="window.selecionarServico('Prime Video')">
+                        <div class="svg-container"><span style="font-weight:bold; font-size:20px; color:#00A8E1;"><img
+                                    src="icons8-amazon-prime.svg" alt=""></span></div>
+                        <div
+                            style="display: flex; justify-content: space-between; width: 100%; color: var(--text-muted); font-size: 14px;">
+                            <span>Plataforma</span><span style="color: var(--text-main); font-weight: 600;">Vender
+                                &rarr;</span>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="brand-card spotify" onclick="window.selecionarServico('Spotify')"
+                        style="border-left: 4px solid #1DB954;">
+                        <div class="svg-container"><span style="font-weight:bold; font-size:24px; color:#1DB954;"><img
+                                    src="spotify-ar21.svg" alt="Spotify" style="height:24px;"></span></div>
+                        <div
+                            style="display: flex; justify-content: space-between; width: 100%; color: var(--text-muted); font-size: 14px;">
+                            <span>Plataforma</span><span style="color: var(--text-main); font-weight: 600;">Vender
+                                &rarr;</span>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+
+            <div class="content-wrapper" id="venda-form" style="display: none;">
                 <h2 id="tituloVenda">Registar Venda</h2>
                 <p class="subtitle">Complete os passos abaixo para gerar o recibo e alocar o cliente.</p>
 
@@ -160,9 +285,11 @@
                     <!-- Gerado dinamicamente -->
                 </div>
 
-                <div class="section-label"><i data-lucide="monitor-play" size="16"></i> 2. Seleção de Perfil <span style="font-size:10px; font-weight:normal; margin-left:10px;">(As barrinhas indicam a lotação atual)</span></div>
+                <div class="section-label"><i data-lucide="monitor-play" size="16"></i> 2. Seleção de Perfil <span
+                        style="font-size:10px; font-weight:normal; margin-left:10px;">(As barrinhas indicam a lotação
+                        atual)</span></div>
                 <div class="grid-profiles" id="containerPerfis">
-                    </div>
+                </div>
 
                 <div class="section-label"><i data-lucide="user-plus" size="16"></i> 3. Informações do Cliente</div>
                 <div class="form-grid">
@@ -175,13 +302,18 @@
                         <span class="prefix">+258</span>
                         <input type="tel" id="clienteContacto" placeholder="8X XXX XXXX">
                     </div>
+                    <div class="input-group" id="containerEmailCliente" style="display: none; grid-column: 1 / -1;">
+                        <i data-lucide="mail" size="18" class="input-icon"></i>
+                        <input type="email" id="clienteEmail" placeholder="Email do Cliente">
+                    </div>
                     <div class="input-group">
                         <i data-lucide="calendar" size="18" class="input-icon"></i>
                         <span class="prefix" style="left: 44px; font-size: 13px; font-weight: normal;">Início:</span>
                         <input type="date" id="dataInicioVenda" style="padding-left: 90px;">
                     </div>
                 </div>
-                <button class="btn-primary" id="btnSalvar" onclick="salvarVendaFirebase()"><i data-lucide="file-check-2" size="20"></i> Confirmar Venda & Gerar PDF</button>
+                <button class="btn-primary" id="btnSalvar" onclick="window.salvarVendaFirebase()"><i data-lucide="file-check-2"
+                        size="20"></i> Confirmar Venda & Gerar PDF</button>
             </div>
         </div>
 
@@ -189,23 +321,28 @@
             <div class="content-wrapper">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
                     <h2 style="margin: 0;">Histórico de Clientes</h2>
-                    <button class="btn-primary" style="margin: 0; padding: 0 16px; height: 36px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; font-size: 13px;" onclick="abrirModalVIP()">
+                    <button class="btn-primary"
+                        style="margin: 0; padding: 0 16px; height: 36px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; font-size: 13px;"
+                        onclick="window.abrirModalVIP()">
                         <i data-lucide="award" size="16"></i> Clientes VIP
                     </button>
                 </div>
-                <p class="subtitle" style="margin-top: 8px;">Acompanhe as suas vendas, exporte recibos e identifique subscrições expiradas.</p>
-                
+                <p class="subtitle" style="margin-top: 8px;">Acompanhe as suas vendas, exporte recibos e identifique
+                    subscrições expiradas.</p>
+
                 <div class="filters-row">
                     <div class="input-group" style="width: 100%;">
                         <i data-lucide="search" size="18" class="input-icon"></i>
-                        <input type="text" id="filtroPesquisa" placeholder="Nome, Contacto ou Perfil..." onkeyup="aplicarFiltrosLocal()">
+                        <input type="text" id="filtroPesquisa" placeholder="Nome, Contacto ou Perfil..."
+                            onkeyup="window.aplicarFiltrosLocal()">
                     </div>
-                    <select id="filtroServico" class="filter-select" onchange="aplicarFiltrosLocal()">
+                    <select id="filtroServico" class="filter-select" onchange="window.aplicarFiltrosLocal()">
                         <option value="">Todos Serviços</option>
                         <option value="Netflix">Netflix</option>
                         <option value="Prime Video">Prime Video</option>
+                        <!-- <option value="Spotify">Spotify</option> -->
                     </select>
-                    <select id="filtroStatus" class="filter-select" onchange="aplicarFiltrosLocal()">
+                    <select id="filtroStatus" class="filter-select" onchange="window.aplicarFiltrosLocal()">
                         <option value="">Todos Estados</option>
                         <option value="ativo">Ativos</option>
                         <option value="expirado">Expirados</option>
@@ -224,8 +361,9 @@
         <div id="screen-settings" class="screen">
             <div class="content-wrapper">
                 <h2>Configurações das Contas</h2>
-                <p class="subtitle" style="margin-bottom:24px;">Faça a gestão das credenciais mestras e dos PINs de acesso.</p>
-                
+                <p class="subtitle" style="margin-bottom:24px;">Faça a gestão das credenciais mestras e dos PINs de
+                    acesso.</p>
+
                 <div id="settingsContainer">
                     <div class="loader-container">
                         <i data-lucide="loader" class="lucide-spin"></i> A carregar configurações...
@@ -237,10 +375,14 @@
     </main>
 
     <nav class="bottom-nav">
-        <button class="bottom-nav-item active" data-target="screen-home" onclick="navTo('screen-home')"><i data-lucide="layout-dashboard"></i> Painel</button>
-        <button class="bottom-nav-item" data-target="screen-sales" onclick="navTo('screen-sales')"><i data-lucide="plus-circle"></i> Vender</button>
-        <button class="bottom-nav-item" data-target="screen-records" onclick="navTo('screen-records')"><i data-lucide="folder-open"></i> Registos</button>
-        <button class="bottom-nav-item" data-target="screen-settings" onclick="navTo('screen-settings')"><i data-lucide="settings"></i> Config</button>
+        <button class="bottom-nav-item active" data-target="screen-home" onclick="window.navTo('screen-home')"><i
+                data-lucide="layout-dashboard"></i> Painel</button>
+        <button class="bottom-nav-item" data-target="screen-sales" onclick="window.prepararNovaVenda()"><i
+                data-lucide="plus-circle"></i> Vender</button>
+        <button class="bottom-nav-item" data-target="screen-records" onclick="window.navTo('screen-records')"><i
+                data-lucide="folder-open"></i> Registos</button>
+        <button class="bottom-nav-item" data-target="screen-settings" onclick="window.navTo('screen-settings')"><i
+                data-lucide="settings"></i> Config</button>
     </nav>
 
     <div id="recibo-oculto-container">
@@ -249,107 +391,216 @@
             <div class="pdf-background-pattern" style="top: 30%; right: 5%; transform: rotate(15deg);">PAY</div>
             <div class="pdf-background-pattern" style="top: 55%; left: -5%; transform: rotate(45deg);">RECIBO</div>
             <div class="pdf-background-pattern" style="bottom: 10%; right: 10%; transform: rotate(-10deg);">SHOP</div>
-            
+
             <div class="pdf-content">
                 <div class="pdf-header-grid">
                     <div class="pdf-logo-box">
-                        <span style="font-weight: 900; font-size: 32px; color: #000; letter-spacing: -1px;">                        <img src="Sem nome (3080 x 1920 px) (2080 x 1920 px).svg" alt="" style="height: 28rem; width: 28rem; margin-left: -90px;"></span>
+                        <span style="font-weight: 900; font-size: 32px; color: #000; letter-spacing: -1px;"> <img
+                                src="Sem nome (3080 x 1920 px) (2080 x 1920 px).svg" alt=""
+                                style="height: 28rem; width: 28rem; margin-left: -90px;"></span>
                     </div>
-                    <div><h1 class="pdf-title-doc">Recibo</h1><div class="pdf-doc-id" id="pdfId">#SYS-000000</div></div>
+                    <div>
+                        <h1 class="pdf-title-doc">Recibo</h1>
+                        <div class="pdf-doc-id" id="pdfId">#SYS-000000</div>
+                    </div>
                 </div>
-                
+
                 <div class="pdf-parties">
-                    <div class="pdf-party-box"><h4>Faturado A</h4><div class="pdf-info-line"><strong id="pdfNomeCliente" style="font-size: 16px;">...</strong></div><div class="pdf-info-line" id="pdfTelefone">...</div></div>
-                    <div class="pdf-party-box" style="text-align: right;"><h4>Emitido Por</h4><div class="pdf-info-line"><strong>ShopSync</strong></div><div class="pdf-info-line">Agostinho Marques Sanli</div><div class="pdf-info-line">Pemba, Moçambique</div></div>
+                    <div class="pdf-party-box">
+                        <h4>Faturado A</h4>
+                        <div class="pdf-info-line"><strong id="pdfNomeCliente" style="font-size: 16px;">...</strong>
+                        </div>
+                        <div class="pdf-info-line" id="pdfTelefone">...</div>
+                    </div>
+                    <div class="pdf-party-box" style="text-align: right;">
+                        <h4>Emitido Por</h4>
+                        <div class="pdf-info-line"><strong>ShopSync</strong></div>
+                        <div class="pdf-info-line">Agostinho Marques Sanli</div>
+                        <div class="pdf-info-line">Pemba, Moçambique</div>
+                    </div>
                 </div>
 
                 <div class="pdf-credentials">
                     <div class="pdf-cred-title">CREDENCIAIS DE ACESSO À PLATAFORMA</div>
-                    <div class="pdf-cred-item"><div class="pdf-cred-label">Email de Login</div><div class="pdf-cred-value" id="pdfEmailConta">...</div></div>
-                    <div class="pdf-cred-item"><div class="pdf-cred-label">Palavra-passe</div><div class="pdf-cred-value" id="pdfSenhaConta">...</div></div>
-                    <div class="pdf-cred-item"><div class="pdf-cred-label">Perfil Designado</div><div class="pdf-cred-value" id="pdfNomePerfil">...</div></div>
-                    <div class="pdf-cred-item"><div class="pdf-cred-label">PIN do Perfil</div><div class="pdf-cred-value" id="pdfPinPerfil">...</div></div>
+                    <div class="pdf-cred-item">
+                        <div class="pdf-cred-label" id="pdfEmailContaLabel">Email de Login</div>
+                        <div class="pdf-cred-value" id="pdfEmailConta">...</div>
+                    </div>
+                    <div class="pdf-cred-item">
+                        <div class="pdf-cred-label" id="pdfSenhaContaLabel">Palavra-passe</div>
+                        <div class="pdf-cred-value" id="pdfSenhaConta">...</div>
+                    </div>
+                    <div class="pdf-cred-item">
+                        <div class="pdf-cred-label">Perfil Designado</div>
+                        <div class="pdf-cred-value" id="pdfNomePerfil">...</div>
+                    </div>
+                    <div class="pdf-cred-item">
+                        <div class="pdf-cred-label">PIN do Perfil</div>
+                        <div class="pdf-cred-value" id="pdfPinPerfil">...</div>
+                    </div>
                 </div>
 
                 <table class="pdf-table">
-                    <thead><tr><th style="width: 50%;">Descrição do Serviço</th><th>Data Início</th><th>Data Expiração</th><th style="text-align: right;">Total</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">Descrição do Serviço</th>
+                            <th>Data Início</th>
+                            <th>Data Expiração</th>
+                            <th style="text-align: right;">Total</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><strong id="pdfServicoTexto" style="color: #0f172a; font-size: 15px;">...</strong><br><span style="font-size: 13px; color: #64748b; margin-top: 4px; display: block;">Acesso privado garantido sem quebras.</span></td><td id="pdfDataInicio">...</td><td id="pdfDataFim" style="font-weight:700; color:#0f172a;">...</td><td style="text-align: right; font-weight: 600;" id="pdfPreco">...</td></tr>
-                        <tr class="pdf-total-row"><td colspan="3" style="text-align: right; text-transform: uppercase; font-size: 12px; color: #64748b; padding-right: 20px;">Total a Pagar</td><td style="text-align: right;" id="pdfTotal">...</td></tr>
+                        <tr>
+                            <td><strong id="pdfServicoTexto"
+                                    style="color: #0f172a; font-size: 15px;">...</strong><br><span
+                                    style="font-size: 13px; color: #64748b; margin-top: 4px; display: block;">Acesso
+                                    privado garantido sem quebras.</span></td>
+                            <td id="pdfDataInicio">...</td>
+                            <td id="pdfDataFim" style="font-weight:700; color:#0f172a;">...</td>
+                            <td style="text-align: right; font-weight: 600;" id="pdfPreco">...</td>
+                        </tr>
+                        <tr class="pdf-total-row">
+                            <td colspan="3"
+                                style="text-align: right; text-transform: uppercase; font-size: 12px; color: #64748b; padding-right: 20px;">
+                                Total a Pagar</td>
+                            <td style="text-align: right;" id="pdfTotal">...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            
-            <div class="pdf-footer"><strong>TERMOS DE GARANTIA E UTILIZAÇÃO:</strong> 1. O acesso entra em vigor na data de emissão deste documento e é válido ininterruptamente até à data de expiração. 2. Para assegurar a garantia da conta, é rigorosamente <strong>proibida a alteração do Email ou da Palavra-passe</strong> original da conta. 3. O uso deve ser efetuado <strong>exclusivamente no perfil designado</strong> (acima). O acesso indevido a perfis de terceiros ou o uso em múltiplos ecrãs em simultâneo resultará na suspensão imediata do serviço, sem direito a reembolso.</div>
+
+            <div class="pdf-footer"><strong>TERMOS DE GARANTIA E UTILIZAÇÃO:</strong> 1. O acesso entra em vigor na data
+                de emissão deste documento e é válido ininterruptamente até à data de expiração. 2. Para assegurar a
+                garantia da conta, é rigorosamente <strong>proibida a alteração do Email ou da Palavra-passe</strong>
+                original da conta. 3. O uso deve ser efetuado <strong>exclusivamente no perfil designado</strong>
+                (acima). O acesso indevido a perfis de terceiros ou o uso em múltiplos ecrãs em simultâneo resultará na
+                suspensão imediata do serviço, sem direito a reembolso.</div>
         </div>
     </div>
 
     <!-- MODAL DE PERFIL DO UTILIZADOR -->
-    <div id="modalPerfil" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center; animation: fadeIn 0.2s ease;">
-        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:32px; width:100%; max-width:350px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align:center;">
-            <div style="width: 64px; height: 64px; background: var(--bg-elevated); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
-                <i data-lucide="user" size="32" style="color:var(--text-main);"></i>
+    <div id="modalPerfil"
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center; animation: fadeIn 0.2s ease;">
+        <div
+            style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:32px; width:100%; max-width:450px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align:center; position: relative; max-height: 90vh; overflow-y: auto;">
+            <div style="position: absolute; top: 16px; right: 16px; cursor: pointer;"
+                onclick="document.getElementById('modalPerfil').style.display='none'">
+                <i data-lucide="x" size="24" style="color:var(--text-muted);"></i>
             </div>
-            <h3 style="margin:0 0 4px 0; font-size:20px;">Conta de Administrador</h3>
-            <p id="perfilEmail" style="color:var(--text-muted); font-size:14px; margin-bottom:24px;">...</p>
-            
-            <div style="text-align:left; background:var(--bg-base); padding:16px; border-radius:8px; margin-bottom:24px;">
-                <p style="font-size:12px; color:var(--text-muted); margin:0 0 4px 0;">Plano Atual</p>
-                <p style="font-size:14px; color:var(--text-main); font-weight:600; margin:0;"><i data-lucide="shield-check" size="14" style="color:var(--success); margin-right:4px;"></i> ShopSync Pro</p>
+            <div
+                style="width: 80px; height: 80px; background: var(--bg-elevated); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                <i data-lucide="user" size="40" style="color:var(--accent-blue);"></i>
+            </div>
+            <h3 style="margin:0 0 4px 0; font-size:22px;">Conta de Administrador</h3>
+            <p id="perfilEmail" style="color:var(--text-muted); font-size:15px; margin-bottom:24px;">...</p>
+
+            <div
+                style="margin-bottom:24px; text-align:center; background:var(--bg-base); padding:16px; border-radius:8px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <p
+                    style="font-size:12px; color:var(--text-muted); margin:0 0 4px 0; text-transform:uppercase; letter-spacing:1px;">
+                    Estado da Conta</p>
+                <p
+                    style="font-size:16px; color:var(--success); font-weight:600; margin:0; display:flex; align-items:center; gap:6px;">
+                    <i data-lucide="check-circle-2" size="18" style="color:var(--success);"></i> Conta Ativa
+                </p>
             </div>
 
-            <button class="btn-primary" style="width:100%; margin-top:0;" onclick="document.getElementById('modalPerfil').style.display='none'">Fechar</button>
+            <div
+                style="text-align: left; margin-bottom: 8px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+                <h4 style="margin:0 0 16px 0; font-size:16px; display:flex; align-items:center; gap:8px;"><i
+                        data-lucide="key" size="18"></i> Trocar Palavra-passe</h4>
+
+                <form onsubmit="event.preventDefault(); window.alterarSenha();">
+                    <div class="input-group" style="margin-bottom: 12px;">
+                        <i data-lucide="lock" class="input-icon" size="18"></i>
+                        <input type="password" id="senhaAtualPerfil" placeholder="Palavra-passe atual" autocomplete="current-password"
+                            style="padding-left:48px; padding-right:48px;">
+                        <i data-lucide="eye" class="input-icon-right" onclick="window.toggleVisibility('senhaAtualPerfil', this)"
+                            size="18" style="cursor:pointer;"></i>
+                    </div>
+
+                    <div class="input-group" style="margin-bottom: 16px;">
+                        <i data-lucide="lock" class="input-icon" size="18"></i>
+                        <input type="password" id="novaSenhaPerfil" placeholder="Nova palavra-passe (mín. 6 caracteres)" autocomplete="new-password"
+                            style="padding-left:48px; padding-right:48px;">
+                        <i data-lucide="eye" class="input-icon-right" onclick="window.toggleVisibility('novaSenhaPerfil', this)"
+                            size="18" style="cursor:pointer;"></i>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="btnAlterarSenha" style="width:100%; margin-top:0;"><i data-lucide="save" size="18"></i> Atualizar Palavra-passe</button>
+                </form>
+            </div>
         </div>
     </div>
 
     <!-- MODAL DE CONFIRMAÇÃO DE LOGOUT -->
-    <div id="modalConfirmacao" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center; animation: fadeIn 0.2s ease;">
-        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:32px; width:100%; max-width:350px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+    <div id="modalConfirmacao"
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center; animation: fadeIn 0.2s ease;">
+        <div
+            style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:32px; width:100%; max-width:350px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
             <i data-lucide="log-out" size="40" style="color:var(--danger); margin-bottom:16px;"></i>
             <h3 style="margin:0 0 8px 0; font-size:20px;">Terminar Sessão</h3>
-            <p style="color:var(--text-muted); font-size:14px; margin-bottom:24px;">Tem a certeza que pretende sair da sua conta?</p>
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:24px;">Tem a certeza que pretende sair da
+                sua conta?</p>
             <div style="display:flex; gap:12px;">
-                <button class="btn-secondary" style="flex:1; justify-content:center;" onclick="document.getElementById('modalConfirmacao').style.display='none'">Cancelar</button>
-                <button class="btn-primary" style="flex:1; background:var(--danger); border-color:var(--danger); margin-top:0;" onclick="fazerLogout()">Sair</button>
+                <button class="btn-secondary" style="flex:1; justify-content:center;"
+                    onclick="document.getElementById('modalConfirmacao').style.display='none'">Cancelar</button>
+                <button class="btn-primary"
+                    style="flex:1; background:var(--danger); border-color:var(--danger); margin-top:0;"
+                    onclick="window.fazerLogout()">Sair</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL DE SUCESSO PÓS-VENDA -->
-    <div id="modalSucesso" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:2500; align-items:center; justify-content:center; animation: fadeIn 0.2s ease;">
-        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:32px; width:100%; max-width:380px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-            <div style="width: 64px; height: 64px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+    <div id="modalSucesso"
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:2500; align-items:center; justify-content:center; animation: fadeIn 0.2s ease;">
+        <div
+            style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:32px; width:100%; max-width:380px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+            <div
+                style="width: 64px; height: 64px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
                 <i data-lucide="check-circle-2" size="32" style="color:var(--success);"></i>
             </div>
             <h3 style="margin:0 0 8px 0; font-size:22px;">Venda Registada!</h3>
-            <p style="color:var(--text-muted); font-size:14px; margin-bottom:24px;">Como deseja partilhar os dados de acesso com o cliente?</p>
-            
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:24px;">Como deseja partilhar os dados de
+                acesso com o cliente?</p>
+
             <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
                 <button class="btn-primary" id="btnSucessoWhatsApp" style="margin:0; background:#25D366; border:none;">
                     <i data-lucide="message-circle" size="20"></i> Enviar por WhatsApp
                 </button>
-                <button class="btn-primary" id="btnSucessoPDF" style="margin:0; background:var(--bg-elevated); border:1px solid var(--border-color); color:var(--text-main);">
+                <button class="btn-primary" id="btnSucessoEmail" style="margin:0; background:#f59e0b; border:none;">
+                    <i data-lucide="mail" size="20"></i> Enviar Alerta por Email
+                </button>
+                <button class="btn-primary" id="btnSucessoPDF"
+                    style="margin:0; background:var(--bg-elevated); border:1px solid var(--border-color); color:var(--text-main);">
                     <i data-lucide="file-down" size="20"></i> Baixar Recibo PDF
                 </button>
             </div>
-            
-            <button class="btn-secondary" style="width:100%; justify-content:center;" onclick="fecharModalSucesso()">Concluir</button>
+
+            <button class="btn-secondary" style="width:100%; justify-content:center;"
+                onclick="window.fecharModalSucesso()">Concluir</button>
         </div>
     </div>
 
     <!-- MODAL DE CLIENTES VIP -->
-    <div id="modalVIP" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:2500; align-items:center; justify-content:center; animation: fadeIn 0.2s ease;">
-        <div style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:24px; width:90%; max-width:450px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; max-height: 80vh;">
+    <div id="modalVIP"
+        style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:2500; align-items:center; justify-content:center; animation: fadeIn 0.2s ease;">
+        <div
+            style="background:var(--bg-surface); border:1px solid var(--border-color); border-radius:16px; padding:24px; width:90%; max-width:450px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; max-height: 80vh;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 style="margin:0; font-size:20px; display: flex; align-items: center; gap: 8px;">
                     <i data-lucide="award" size="24" style="color:#f59e0b;"></i> Clientes VIP
                 </h3>
-                <i data-lucide="x" size="24" style="color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('modalVIP').style.display='none'"></i>
+                <i data-lucide="x" size="24" style="color:var(--text-muted); cursor:pointer;"
+                    onclick="document.getElementById('modalVIP').style.display='none'"></i>
             </div>
-            
-            <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">Ranking de clientes ordenado por total faturado (valor vitalício).</p>
-            
-            <div id="listaVIP" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 8px;">
+
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">Ranking de clientes ordenado por
+                total faturado (valor vitalício).</p>
+
+            <div id="listaVIP"
+                style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 8px;">
                 <!-- Lista de VIPs aqui -->
             </div>
         </div>
@@ -358,4 +609,5 @@
     <!-- Scripts -->
     <script type="module" src="script.js"></script>
 </body>
+
 </html>
