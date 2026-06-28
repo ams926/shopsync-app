@@ -449,8 +449,9 @@ window.salvarVendaFirebase = async function () {
         };
 
         document.getElementById('btnSucessoWhatsApp').onclick = () => window.enviarWhatsApp(vendaTemp);
+        document.getElementById('btnSucessoPartilharPDF').onclick = async () => { await window.partilharPDF(vendaTemp); };
         document.getElementById('btnSucessoPDF').onclick = async () => { await window.gerarPDF(vendaTemp); };
-        document.getElementById('btnSucessoEmail').onclick = () => window.enviarEmailAutomatico(vendaTemp);
+        // document.getElementById('btnSucessoEmail').onclick = () => window.enviarEmailAutomatico(vendaTemp);
         document.getElementById('modalSucesso').style.display = 'flex';
 
     } catch (error) { mostrarToast("❌ Erro ao guardar na nuvem."); } finally { btn.innerHTML = originalHTML; btn.disabled = false; }
@@ -713,10 +714,16 @@ window.aplicarFiltrosLocal = function () {
 
             let btnPdfHtml = '';
             if (window.baseDeDadosContas[venda.servico]) {
-                btnPdfHtml = `<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content: flex-end;">
-                    <button class="btn-icon" style="color: #eab308; border-color: rgba(234, 179, 8, 0.3);" onclick="enviarLembreteWhatsApp('${venda.id}')" title="Aviso de Renovação"><i data-lucide="bell" size="14"></i> Cobrar</button>
-                    <button class="btn-icon" style="color: #25D366; border-color: rgba(37, 211, 102, 0.3);" onclick="enviarWhatsAppByID('${venda.id}')" title="Enviar Dados Iniciais (WhatsApp)"><i data-lucide="message-circle" size="14"></i> WA</button>
-                    <button class="btn-icon" onclick="gerarPDFByID('${venda.id}')" title="Baixar Recibo PDF"><i data-lucide="download" size="14"></i> PDF</button>
+                btnPdfHtml = `<div class="dropdown" style="position: relative; display: inline-block;">
+                    <button class="btn-icon" onclick="toggleDropdown('${venda.id}')" title="Opções" style="background:transparent; border:none; padding:4px;"><i data-lucide="more-vertical" size="18"></i></button>
+                    <div id="dropdown-${venda.id}" class="dropdown-content">
+                        <button class="dropdown-item" onclick="enviarLembreteWhatsApp('${venda.id}')"><i data-lucide="bell" size="16"></i> Cobrar</button>
+                        <button class="dropdown-item" onclick="prepararRenovacao('${venda.id}')"><i data-lucide="refresh-cw" size="16"></i> Renovar</button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" onclick="enviarWhatsAppByID('${venda.id}')"><i data-lucide="message-circle" size="16"></i> Enviar Dados (WA)</button>
+                        <button class="dropdown-item" onclick="partilharPDFByID('${venda.id}')"><i data-lucide="share-2" size="16"></i> Partilhar PDF</button>
+                        <button class="dropdown-item" onclick="gerarPDFByID('${venda.id}')"><i data-lucide="download" size="16"></i> Baixar PDF</button>
+                    </div>
                 </div>`;
             }
 
@@ -729,10 +736,6 @@ window.aplicarFiltrosLocal = function () {
                         <h3 style="margin: 0 0 4px 0; font-size: 16px; color: var(--text-main);">${venda.nomeCliente}</h3>
                         <p style="font-size: 13px;">${venda.telefone}</p>
                         <p style="font-size: 12px; margin-top:8px;">${venda.pacote} • Expira a ${venda.dataExpiracao.toLocaleDateString('pt-PT')}</p>
-                        
-                        <div style="margin-top: 12px; display: flex; gap: 8px;">
-                            <button class="btn-success" onclick="prepararRenovacao('${venda.id}')"><i data-lucide="refresh-cw" size="12"></i> Renovar</button>
-                        </div>
                     </div>
                     <div style="text-align: right; display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
                         <div>
@@ -754,6 +757,11 @@ window.aplicarFiltrosLocal = function () {
 window.gerarPDFByID = async function (id) {
     const venda = window.todasAsVendas.find(v => v.id === id);
     if (venda) await window.gerarPDF(venda);
+}
+
+window.partilharPDFByID = async function (id) {
+    const venda = window.todasAsVendas.find(v => v.id === id);
+    if (venda) await window.partilharPDF(venda);
 };
 
 window.fecharModalSucesso = function () {
@@ -763,6 +771,21 @@ window.fecharModalSucesso = function () {
     document.getElementById('dataInicioVenda').valueAsDate = new Date();
     goBack();
 };
+
+window.toggleDropdown = function(id) {
+    const allDropdowns = document.querySelectorAll('.dropdown-content');
+    const target = document.getElementById('dropdown-' + id);
+    const isVisible = target && target.style.display === 'block';
+
+    allDropdowns.forEach(d => d.style.display = 'none');
+    if (!isVisible && target) target.style.display = 'block';
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-content').forEach(d => d.style.display = 'none');
+    }
+});
 
 window.enviarWhatsApp = function (venda) {
     if (!venda) return;
@@ -790,23 +813,23 @@ window.enviarWhatsApp = function (venda) {
     let texto = "";
     if (venda.servico === 'Spotify') {
         texto = `Olá ${venda.nomeCliente}! Obrigado pela preferência.
-Aqui estão os detalhes da sua assinatura ${venda.servico} Familiar:
+Aqui estão os detalhes da sua assinatura *${venda.servico}* Familiar:
 
-👤 Vaga Designada: ${venda.perfil}
-🗓️ Válido até: ${venda.dataExpiracao.toLocaleDateString('pt-PT')}
+*👤 Vaga Designada:* ${venda.perfil}
+*🗓️ Válido até:* ${venda.dataExpiracao.toLocaleDateString('pt-PT')}
 
-🔗 Como Ativar:
+*🔗 Como Ativar:*
 Será enviado um convite oficial do Spotify para o seu email pessoal. Por favor, abra a sua caixa de entrada, clique em "Aceitar Convite" e confirme com a sua própria conta.`;
     } else {
         texto = `Olá ${venda.nomeCliente}! Obrigado pela preferência.
-Aqui estão os dados do seu acesso ${venda.servico}:
+Aqui estão os dados do seu acesso *${venda.servico}*:
 
-- Email: ${email}
-- Senha: ${senha}
-- Perfil: ${venda.perfil}
-- PIN: ${pin}
+*📧 Email:* ${email}
+*🔑 Senha:* ${senha}
+*👤 Perfil:* ${venda.perfil}
+*🔢 PIN:* ${pin}
 
-O seu acesso expira a: ${venda.dataExpiracao.toLocaleDateString('pt-PT')}.
+O seu acesso expira a: *${venda.dataExpiracao.toLocaleDateString('pt-PT')}*.
 Bom entretenimento!`;
     }
 
@@ -886,7 +909,7 @@ window.enviarLembreteWhatsApp = function (id) {
     window.open(url, '_blank');
 };
 
-window.gerarPDF = async function (venda) {
+window.preencherMoldePDF = function (venda) {
     const contaMaster = window.baseDeDadosContas[venda.servico];
     const perfilDetalhes = contaMaster.perfis.find(p => p.nome === venda.perfil);
     const pinExato = perfilDetalhes ? perfilDetalhes.pin : "N/A";
@@ -913,14 +936,52 @@ window.gerarPDF = async function (venda) {
     document.getElementById('pdfDataFim').innerText = venda.dataExpiracao.toLocaleDateString('pt-PT');
     document.getElementById('pdfPreco').innerText = `${venda.precoMZN},00 MZN`;
     document.getElementById('pdfTotal').innerText = `${venda.precoMZN},00 MZN`;
+}
 
-    await html2pdf().set({
+window.gerarPDF = async function (venda) {
+    window.preencherMoldePDF(venda);
+    const opt = {
         margin: 0,
         filename: `Recibo_${venda.servico}_${venda.nomeCliente.replace(/ /g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
-    }).from(document.getElementById('molde-pdf')).save();
+    };
+    await html2pdf().set(opt).from(document.getElementById('molde-pdf')).save();
+    mostrarToast('Recibo PDF descarregado.');
+}
+
+window.partilharPDF = async function (venda) {
+    window.preencherMoldePDF(venda);
+    const opt = {
+        margin: 0,
+        filename: `Recibo_${venda.servico}_${venda.nomeCliente.replace(/ /g, '_')}.pdf`,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+    };
+
+    try {
+        const pdfBlob = await html2pdf().set(opt).from(document.getElementById('molde-pdf')).output('blob');
+        const file = new File([pdfBlob], opt.filename, { type: 'application/pdf' });
+
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: 'Recibo de Venda',
+                text: `Olá ${venda.nomeCliente}, segue o recibo da sua conta ${venda.servico}.`
+            });
+            mostrarToast('PDF partilhado com sucesso!');
+        } else {
+            await html2pdf().set(opt).from(document.getElementById('molde-pdf')).save();
+            mostrarToast('PDF descarregado (Partilha direta não suportada no seu navegador).');
+        }
+    } catch (error) {
+        console.error('Erro ao gerar ou partilhar o PDF:', error);
+        if (error.name !== 'AbortError') {
+            await html2pdf().set(opt).from(document.getElementById('molde-pdf')).save();
+        }
+    }
 }
 
 function mostrarToast(mensagem) {

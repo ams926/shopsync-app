@@ -1220,3 +1220,56 @@ p.subtitle {
     position: relative;
     z-index: 1;
 }
+
+/* DROPDOWN MENU (Shadcn UI style) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 32px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 5px;
+    z-index: 100;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.15s ease-out;
+}
+
+.dropdown-item {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: 0.15s;
+    margin-bottom: 2px;
+}
+
+.dropdown-item:last-child {
+    margin-bottom: 0;
+}
+
+.dropdown-item:hover {
+    background: var(--bg-elevated);
+    color: var(--text-main);
+}
+
+.dropdown-item i {
+    color: var(--text-muted);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 4px 0;
+}
