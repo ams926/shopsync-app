@@ -511,6 +511,7 @@
                         data-lucide="key" size="18"></i> Trocar Palavra-passe</h4>
 
                 <form onsubmit="event.preventDefault(); window.alterarSenha();">
+                    <input type="text" autocomplete="username" style="display:none;" aria-hidden="true" id="hiddenUsername">
                     <div class="input-group" style="margin-bottom: 12px;">
                         <i data-lucide="lock" class="input-icon" size="18"></i>
                         <input type="password" id="senhaAtualPerfil" placeholder="Palavra-passe atual" autocomplete="current-password"

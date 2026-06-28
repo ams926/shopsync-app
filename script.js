@@ -543,6 +543,7 @@ window.calcularEstatisticas = function () {
     let ativos = 0;
     let expirar = 0;
     const hoje = new Date();
+    const hojeZero = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
     const tresDias = new Date();
     tresDias.setDate(hoje.getDate() + 3);
 
